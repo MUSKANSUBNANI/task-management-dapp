@@ -10,9 +10,15 @@ function EthProvider({ children }) {
     async artifact => {
       if (artifact) {
         const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+        console.log( web3);
         const accounts = await web3.eth.requestAccounts();
+        console.log(accounts);
         const networkID = await web3.eth.net.getId();
+        console.log(networkID);
+
         const { abi } = artifact;
+        console.log(abi);
+        
         let address, contract;
         try {
           address = artifact.networks[networkID].address;
@@ -30,7 +36,7 @@ function EthProvider({ children }) {
   useEffect(() => {
     const tryInit = async () => {
       try {
-        const artifact = require("../../contracts/SimpleStorage.json");
+        const artifact = require("../../contracts/TaskContract.json");
         init(artifact);
       } catch (err) {
         console.error(err);
