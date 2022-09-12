@@ -1,14 +1,13 @@
 import { useState} from "react";
 import useEth from "../../contexts/EthContext/useEth";
-import Task from "./Task";
+
 function Demo() {
   const { state } = useEth();
   const [inputValue, setInputValue] = useState("");
   const [tasks,setTasks]=useState([]);
 
   const handleInputChange = e => {
-    setInputValue(e.target.value);
-    
+    setInputValue(e.target.value);  
   };
 
   const getAllTasks = async() => {
@@ -18,11 +17,11 @@ function Demo() {
         let allTasks = await TaskContract.methods.getMyTasks().call({ from: state.accounts[0] });
         console.log(allTasks);
         setTasks(allTasks);
+        allTasks.map(item=> console.log(item.id));
       } catch(error) {
       console.log(error);
     }
   }
-
 
   const write = async e => {
     if (e.target.tagName === "INPUT") {
@@ -32,73 +31,75 @@ function Demo() {
       alert("Please enter a value to write.");
       return;
     }
-
     const isComplete =false;
-    console.log( inputValue);
-    console.log( isComplete);
     const taskText = inputValue;
     
     const result= await state.contract.methods.addTask(taskText, isComplete).send({ from:state.accounts[0] });
-    console.log(result);
   };
   
-  const deleteTask = key => async() => {
+  const deleteTask = (key) => async() => {
     console.log(key);
-
-    // Now we got the key, let's delete our tweet
+    // Now we got the key, let's delete our task
     try {
       
-        let deleteTaskTx = await state.contract.methods.deleteTask(key, true).send({ from:state.accounts[0] });
+        let completeTaskTx = await state.contract.methods.toggleCompleteTask(key).send({ from:state.accounts[0] });
         let allTasks = await state.contract.methods.getMyTasks().call({ from: state.accounts[0] });
         setTasks(allTasks);
       }
-
     catch(error) {
       console.log(error);
     }
   }
 
-
-
-  const demo =
-  <div className="btns">
-
+  const getAllTasksDiv =
       <button onClick={getAllTasks}>
         getAllmyTasks
       </button>
 
-      <div onClick={write} className="input-btn">
 
-        write(<input
-          type="text"
-          placeholder="my new Task"
-          value={inputValue}
-          onChange={handleInputChange}
-        />)
+  const AddTasksDiv =
+    <div>
+      Add Task: <input type="text" name="task" value={inputValue} onChange={handleInputChange} />
+      <button type="button" onClick={write}>Add new Task</button>
+    </div>
 
-      </div>
-
-      tasks ? <ul>
-          {tasks.map(item=> 
-            <Task 
-              key={item.id} 
-              taskText={item.taskText} 
-              onClick={deleteTask(item.id)}
-            />)
-          }
-      </ul>: <div></div>
-
+  const ListTasksDiv = 
+  tasks?
+    <div>
+      <h5> Click On Task To Mark It Complete</h5>
+      <ul>
+        {tasks.map(item=> 
+        <li><button  onClick={ deleteTask(item.id)} >{item.taskText}</button></li>)
+        }
+      </ul>
+    </div> 
+    : 
+    <div>
     </div>;
 
 return (
-
-  <div className="demo">
-    {
-      demo
-    }
+  <div>
+     <h1>Simple Task Management App</h1>
+     <br/>
+    <div>
+      {
+        getAllTasksDiv
+      }
+    </div>
+    <br/>
+    <div>
+      {
+        AddTasksDiv
+      }
+    </div>
+    <br/>
+    <div>
+      {
+        ListTasksDiv
+      }
+    </div>
   </div>
 );
-
 }
 
 export default Demo;
