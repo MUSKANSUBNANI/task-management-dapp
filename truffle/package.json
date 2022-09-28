@@ -6,7 +6,9 @@
   "dependencies": {
     "@truffle/hdwallet-provider": "^2.0.10"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "solidity-coverage": "^0.8.2"
+  },
   "scripts": {
     "test": "truffle test"
   },
